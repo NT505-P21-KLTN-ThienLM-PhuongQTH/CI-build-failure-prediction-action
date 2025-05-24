@@ -1,0 +1,14 @@
+name: 'Predict Build Error Action'
+description: 'Predict build errors using hardcoded ML model APIs'
+inputs:
+  api-token:
+    description: 'API token for authentication'
+    required: false
+outputs:
+  prediction:
+    description: 'The predicted result from the API'
+  probability:
+    description: 'The probability of the prediction'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
