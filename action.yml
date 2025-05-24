@@ -1,12 +1,16 @@
 name: 'Predict Build Error Action'
-description: 'Predict build errors using hardcoded ML model APIs'
+description: 'Predict build errors using hardcoded ML model APIs with configurable failure behavior'
 inputs:
   api-token:
     description: 'API token for authentication'
     required: false
+  stop-on-failure:
+    description: 'Stop pipeline if prediction fails (true) or proceed regardless (false)'
+    required: false
+    default: 'false'
 outputs:
   prediction:
-    description: 'The predicted result from the API'
+    description: 'The predicted result from the API (true/false)'
   probability:
     description: 'The probability of the prediction'
 runs:

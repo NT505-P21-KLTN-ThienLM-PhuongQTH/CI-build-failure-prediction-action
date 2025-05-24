@@ -5,13 +5,14 @@ const axios = require('axios');
 (async () => {
     try {
         const apiToken = core.getInput('api-token');
+        const stopOnFailure = core.getInput('stop-on-failure') === 'true'; // Chuyển chuỗi thành boolean, mặc định false
 
         // Hardcode các URL API
         const ghtorrentApiUrl = 'https://d45f-58-187-118-78.ngrok-free.app';
         const appApiUrl = 'https://d0d0-58-187-118-78.ngrok-free.app';
         const predictApiUrl = 'https://golden-lacewing-famous.ngrok-free.app/predict';
 
-        core.info(`[INFO] Starting execution with API token: ${apiToken ? 'Provided' : 'Not provided'}`);
+        core.info(`[INFO] Starting execution with stop-on-failure: ${stopOnFailure}, API token: ${apiToken ? 'Provided' : 'Not provided'}`);
 
         // Lấy thông tin repository từ context
         const context = github.context;
@@ -30,7 +31,7 @@ const axios = require('axios');
         headers: apiToken ? { Authorization: `Bearer ${apiToken}` } : {},
         });
         const ciBuilds = ciBuildsResponse.data.ci_builds;
-        core.debug(`[DEBUG] GHTorrent Response: ${JSON.stringify(ciBuilds, null, 2)}`);
+
         if (!ciBuilds || ciBuilds.length === 0) {
         throw new Error('No ci_builds data retrieved from GHTorrent API');
         }
@@ -43,11 +44,9 @@ const axios = require('axios');
         });
         const { name: predictName, latest_versions } = modelResponse.data;
         const predictVersion = latest_versions[0].version;
-        core.debug(`[DEBUG] Model Response: ${JSON.stringify({ predictName, predictVersion }, null, 2)}`);
 
         // Gọi API Predict để dự đoán
         core.info(`[INFO] Calling Predict API: ${predictApiUrl}`);
-        core.debug(`[DEBUG] Predict Request Body: ${JSON.stringify({ predict_name: predictName, predict_version: predictVersion, ci_builds: ciBuilds }, null, 2)}`);
         const predictResponse = await axios.post(
         predictApiUrl,
         {
@@ -66,28 +65,16 @@ const axios = require('axios');
         timestamp,
         execution_time,
         } = predictResponse.data;
-        core.debug(`[DEBUG] Predict Response: ${JSON.stringify(predictResponse.data, null, 2)}`);
 
         // Lấy github_run_id
         const githubRunId = github.context.runId;
         if (!githubRunId) {
         throw new Error('Could not retrieve github_run_id from GitHub context');
         }
-        core.info(`[INFO] GitHub Run ID: ${githubRunId}`);
 
         // Gọi API App để cập nhật kết quả dự đoán
         const updateUrl = `${appApiUrl}/api/prediction`;
         core.info(`[INFO] Updating prediction result at: ${updateUrl}`);
-        core.debug(`[DEBUG] Update Request Body: ${JSON.stringify({
-        model_name: predictName,
-        model_version: predictVersion,
-        predicted_result,
-        probability,
-        threshold,
-        timestamp,
-        execution_time,
-        github_run_id: githubRunId,
-        }, null, 2)}`);
         await axios.post(
         updateUrl,
         {
@@ -108,13 +95,13 @@ const axios = require('axios');
         // Đưa kết quả ra output
         core.setOutput('prediction', predicted_result.toString());
         core.setOutput('probability', probability);
-        core.info(`[INFO] Output - Prediction: ${predicted_result.toString()}, Probability: ${probability}`);
+        core.info(`[INFO] Prediction Result - Prediction: ${predicted_result.toString()}, Probability: ${probability}`);
 
-        // Nếu dự đoán có lỗi, fail action
-        if (predicted_result === true) {
-        core.setFailed(`[ERROR] Build error predicted with probability ${probability}`);
+        // Xử lý dựa trên stop-on-failure
+        if (stopOnFailure && predicted_result === true) {
+        core.setFailed(`[ERROR] Build error predicted with probability ${probability} (stop-on-failure enabled)`);
         } else {
-        core.info(`[INFO] Build predicted as successful with probability ${probability}`);
+        core.info(`[INFO] Proceeding with execution (stop-on-failure: ${stopOnFailure})`);
         }
     } catch (error) {
         core.setFailed(`[ERROR] Action failed: ${error.message}`);
