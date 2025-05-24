@@ -54,7 +54,6 @@ const axios = require('axios');
       execution_time,
     } = predictResponse.data;
 
-    // Lấy github_run_id (sửa lỗi chính tả run_id thành runId)
     const githubRunId = github.context.runId;
     if (!githubRunId) {
       throw new Error('Could not retrieve github_run_id from GitHub context');
@@ -62,6 +61,7 @@ const axios = require('axios');
 
     // Log toàn bộ context để debug (nếu cần)
     core.debug(`GitHub Context: ${JSON.stringify(github.context, null, 2)}`);
+    core.debug(`predictResponse: ${JSON.stringify(predictResponse.data, null, 2)}`);
 
     // Gọi API App để cập nhật kết quả dự đoán
     const updateUrl = `${appApiUrl}/api/prediction`;
