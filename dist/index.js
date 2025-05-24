@@ -40061,8 +40061,8 @@ const axios = __nccwpck_require__(7269);
         const apiToken = core.getInput('api-token');
 
         // Hardcode các URL API
-        const ghtorrentApiUrl = 'https://bbd4-58-187-118-78.ngrok-free.app';
-        const appApiUrl = 'https://192d-58-187-118-78.ngrok-free.app';
+        const ghtorrentApiUrl = 'https://d45f-58-187-118-78.ngrok-free.app';
+        const appApiUrl = 'https://d0d0-58-187-118-78.ngrok-free.app';
         const predictApiUrl = 'https://golden-lacewing-famous.ngrok-free.app/predict';
 
         // Lấy thông tin repository từ context
