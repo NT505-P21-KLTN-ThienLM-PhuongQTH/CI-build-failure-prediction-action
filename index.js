@@ -34,7 +34,7 @@ const axios = require('axios');
     }
 
     // Gọi API App để lấy thông tin model hiện tại
-    const modelUrl = `${appApiUrl}/ml_model/current`;
+    const modelUrl = `${appApiUrl}/api/ml_model/current`;
     core.info(`Calling Model API: ${modelUrl}`);
     const modelResponse = await axios.get(modelUrl, {
       headers: apiToken ? { Authorization: `Bearer ${apiToken}` } : {},
