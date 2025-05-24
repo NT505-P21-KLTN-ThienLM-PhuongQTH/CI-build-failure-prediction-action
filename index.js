@@ -55,7 +55,7 @@ const axios = require('axios');
         } = predictResponse.data;
 
         // Lấy github_run_id
-        const githubRunId = github.context.runId;
+        const githubRunId = github.context.run_id;
 
         // Gọi API App để cập nhật kết quả dự đoán
         const updateUrl = `${appApiUrl}/api/prediction`;
