@@ -33,11 +33,22 @@ const axios = require('axios');
       throw new Error('No ci_builds data retrieved from GHTorrent API');
     }
 
+    // Gọi API App để lấy thông tin model hiện tại
+    const modelUrl = `${appApiUrl}/ml_model/current`;
+    core.info(`Calling Model API: ${modelUrl}`);
+    const modelResponse = await axios.get(modelUrl, {
+      headers: apiToken ? { Authorization: `Bearer ${apiToken}` } : {},
+    });
+    const { name: predictName, latest_versions } = modelResponse.data;
+    const predictVersion = latest_versions[0].version;
+
     // Gọi API Predict để dự đoán
     core.info(`Calling Predict API: ${predictApiUrl}`);
     const predictResponse = await axios.post(
       predictApiUrl,
       {
+        predict_name: predictName,
+        predict_version: predictVersion,
         ci_builds: ciBuilds,
       },
       {
@@ -45,23 +56,18 @@ const axios = require('axios');
       }
     );
     const {
-      model_name,
-      model_version,
-      predicted_result,
+      build_failed: predicted_result,
       probability,
       threshold,
       timestamp,
       execution_time,
     } = predictResponse.data;
 
+    // Lấy github_run_id
     const githubRunId = github.context.runId;
     if (!githubRunId) {
       throw new Error('Could not retrieve github_run_id from GitHub context');
     }
-
-    // Log toàn bộ context để debug (nếu cần)
-    core.debug(`GitHub Context: ${JSON.stringify(github.context, null, 2)}`);
-    core.debug(`predictResponse: ${JSON.stringify(predictResponse.data, null, 2)}`);
 
     // Gọi API App để cập nhật kết quả dự đoán
     const updateUrl = `${appApiUrl}/api/prediction`;
@@ -69,8 +75,8 @@ const axios = require('axios');
     await axios.post(
       updateUrl,
       {
-        model_name,
-        model_version,
+        model_name: predictName,
+        model_version: predictVersion,
         predicted_result,
         probability,
         threshold,
@@ -83,15 +89,15 @@ const axios = require('axios');
       }
     );
 
-    // Đưa kết quả ra output
-    core.setOutput('prediction', predicted_result);
+    // Đưa kết quả ra output (chuyển boolean thành chuỗi để output dễ đọc)
+    core.setOutput('prediction', predicted_result.toString());
     core.setOutput('probability', probability);
 
     // Nếu dự đoán có lỗi, fail action
-    if (predicted_result.toLowerCase() === 'error') {
+    if (predicted_result === true) {
       core.setFailed(`Build error predicted with probability ${probability}`);
     } else {
-      core.info(`Build predicted as ${predicted_result} with probability ${probability}`);
+      core.info(`Build predicted as successful with probability ${probability}`);
     }
   } catch (error) {
     core.setFailed(`Action failed: ${error.message}`);
