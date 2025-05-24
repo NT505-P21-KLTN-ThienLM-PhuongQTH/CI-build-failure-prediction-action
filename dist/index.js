@@ -40074,6 +40074,8 @@ const axios = __nccwpck_require__(7269);
         const branch = context.ref.replace('refs/heads/', '');
 
         if (!projectName) {
+        core.setOutput('prediction', 'unknown');
+        core.setOutput('probability', '0');
         throw new Error('Could not retrieve repository name from GitHub context');
         }
         core.info(`[INFO] Repository: ${projectName}, Branch: ${branch}`);
@@ -40085,8 +40087,10 @@ const axios = __nccwpck_require__(7269);
         headers: apiToken ? { Authorization: `Bearer ${apiToken}` } : {},
         });
         const ciBuilds = ciBuildsResponse.data.ci_builds;
-
+        core.debug(`[DEBUG] GHTorrent Response: ${JSON.stringify(ciBuilds, null, 2)}`);
         if (!ciBuilds || ciBuilds.length === 0) {
+        core.setOutput('prediction', 'unknown');
+        core.setOutput('probability', '0');
         throw new Error('No ci_builds data retrieved from GHTorrent API');
         }
 
@@ -40098,6 +40102,7 @@ const axios = __nccwpck_require__(7269);
         });
         const { name: predictName, latest_versions } = modelResponse.data;
         const predictVersion = latest_versions[0].version;
+        core.debug(`[DEBUG] Model Response: ${JSON.stringify({ predictName, predictVersion }, null, 2)}`);
 
         // Gọi API Predict để dự đoán
         core.info(`[INFO] Calling Predict API: ${predictApiUrl}`);
@@ -40119,10 +40124,13 @@ const axios = __nccwpck_require__(7269);
         timestamp,
         execution_time,
         } = predictResponse.data;
+        core.debug(`[DEBUG] Predict Response: ${JSON.stringify(predictResponse.data, null, 2)}`);
 
         // Lấy github_run_id
         const githubRunId = github.context.runId;
         if (!githubRunId) {
+        core.setOutput('prediction', predicted_result.toString());
+        core.setOutput('probability', probability || '0');
         throw new Error('Could not retrieve github_run_id from GitHub context');
         }
 
@@ -40148,16 +40156,18 @@ const axios = __nccwpck_require__(7269);
 
         // Đưa kết quả ra output
         core.setOutput('prediction', predicted_result.toString());
-        core.setOutput('probability', probability);
-        core.info(`[INFO] Prediction Result - Prediction: ${predicted_result.toString()}, Probability: ${probability}`);
+        core.setOutput('probability', probability || '0');
+        core.info(`[INFO] Prediction Result - Prediction: ${predicted_result.toString()}, Probability: ${probability || '0'}`);
 
         // Xử lý dựa trên stop-on-failure
         if (stopOnFailure && predicted_result === true) {
-        core.setFailed(`[ERROR] Build error predicted with probability ${probability} (stop-on-failure enabled)`);
+        core.setFailed(`[ERROR] Build error predicted with probability ${probability || '0'} (stop-on-failure enabled)`);
         } else {
         core.info(`[INFO] Proceeding with execution (stop-on-failure: ${stopOnFailure})`);
         }
     } catch (error) {
+        core.setOutput('prediction', 'unknown'); // Đặt output mặc định khi có lỗi
+        core.setOutput('probability', '0');
         core.setFailed(`[ERROR] Action failed: ${error.message}`);
     }
 })();
