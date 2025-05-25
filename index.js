@@ -8,8 +8,8 @@ const axios = require('axios');
         const stopOnFailure = core.getInput('stop-on-failure') === 'true'; // Chuyển chuỗi thành boolean, mặc định false
 
         // Hardcode các URL API
-        const ghtorrentApiUrl = 'https://d45f-58-187-118-78.ngrok-free.app';
-        const appApiUrl = 'https://d0d0-58-187-118-78.ngrok-free.app';
+        const ghtorrentApiUrl = 'https://5336-118-70-31-96.ngrok-free.app';
+        const appApiUrl = 'https://fad5-118-70-31-96.ngrok-free.app';
         const predictApiUrl = 'https://golden-lacewing-famous.ngrok-free.app/predict';
 
         core.info(`[INFO] Starting execution with stop-on-failure: ${stopOnFailure}, API token: ${apiToken ? 'Provided' : 'Not provided'}`);
