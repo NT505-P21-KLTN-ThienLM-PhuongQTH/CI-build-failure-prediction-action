@@ -40062,8 +40062,8 @@ const axios = __nccwpck_require__(7269);
         const stopOnFailure = core.getInput('stop-on-failure') === 'true'; // Chuyển chuỗi thành boolean, mặc định false
 
         // Hardcode các URL API
-        const ghtorrentApiUrl = 'https://946b-118-70-31-96.ngrok-free.app';
-        const appApiUrl = 'https://cc28-118-70-31-96.ngrok-free.app';
+        const ghtorrentApiUrl = 'https://c923-118-70-31-96.ngrok-free.app';
+        const appApiUrl = 'https://fd8f-118-70-31-96.ngrok-free.app';
         const predictApiUrl = 'https://golden-lacewing-famous.ngrok-free.app/predict';
 
         core.info(`[INFO] Starting execution with stop-on-failure: ${stopOnFailure}, API token: ${apiToken ? 'Provided' : 'Not provided'}`);
