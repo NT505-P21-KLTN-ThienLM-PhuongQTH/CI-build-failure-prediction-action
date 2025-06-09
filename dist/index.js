@@ -40061,8 +40061,8 @@ const axios = __nccwpck_require__(7269);
         const apiToken = core.getInput('api-token');
         const stopOnFailure = core.getInput('stop-on-failure') === 'true';
 
-        const ghtorrentApiUrl = 'https://b367-183-81-87-155.ngrok-free.app';
-        const appApiUrl = 'https://326b-183-81-87-155.ngrok-free.app';
+        const ghtorrentApiUrl = 'https://f3c1-118-71-145-51.ngrok-free.app';
+        const appApiUrl = 'https://06dc-118-71-145-51.ngrok-free.app';
         const predictApiUrl = 'https://golden-lacewing-famous.ngrok-free.app/predict';
 
         core.info(`[INFO] Starting execution with stop-on-failure: ${stopOnFailure}, API token: ${apiToken ? 'Provided' : 'Not provided'}`);
