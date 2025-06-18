@@ -104,7 +104,11 @@ const axios = require('axios');
         // Đưa kết quả ra output
         core.setOutput('prediction', predicted_result.toString());
         core.setOutput('probability', probability || '0');
-        core.info(`[INFO] Prediction Result - Prediction: ${predicted_result.toString()}, Probability: ${probability || '0'}`);
+        if (predicted_result == 1) {
+            core.info(`[INFO] Prediction Result - The prediction for the next build is: FAILURE (Probability: ${probability || '0'})`);
+        } else {
+            core.info(`[INFO] Prediction Result - The prediction for the next build is: SUCCESS (Probability: ${probability || '0'})`);
+        }
 
         // Xử lý dựa trên stop-on-failure
         if (stopOnFailure && predicted_result === true) {
