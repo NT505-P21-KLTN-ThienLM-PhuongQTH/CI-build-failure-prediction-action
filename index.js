@@ -111,7 +111,7 @@ const axios = require('axios');
         }
 
         // Xử lý dựa trên stop-on-failure
-        if (stopOnFailure && predicted_result === true) {
+        if (stopOnFailure && predicted_result == 1) {
             core.setFailed(`[ERROR] Build error predicted with probability ${probability || '0'} (stop-on-failure enabled)`);
         } else {
             core.info(`[INFO] Proceeding with execution (stop-on-failure: ${stopOnFailure})`);
