@@ -40109,7 +40109,7 @@ const axios = __nccwpck_require__(7269);
             predictApiUrl,
             {
                 predict_name: predictName,
-                predict_version: predictVersion,
+                predict_version: 25,
                 ci_builds: ciBuilds,
             },
             {
