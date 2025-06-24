@@ -40085,7 +40085,7 @@ const axios = __nccwpck_require__(7269);
         const ciBuildsResponse = await axios.get(ciBuildsUrl, {
             headers: apiToken ? { Authorization: `Bearer ${apiToken}` } : {},
         });
-        const ciBuilds = ciBuildsResponse.data.ci_builds;
+        const ciBuilds = ciBuildsResponse.data.ci_builds.slice(0, 10); // Note that
         core.debug(`[DEBUG] GHTorrent Response: ${JSON.stringify(ciBuilds, null, 2)}`);
         if (!ciBuilds || ciBuilds.length === 0) {
             core.setOutput('prediction', 'unknown');
